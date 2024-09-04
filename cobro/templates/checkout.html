@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4 text-center">Proceso de Pago</h2>
+
+    <!-- Resumen del carrito -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Resumen de Compra</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for producto in carrito %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>{{ producto.descripcion }}</span>
+                    <span>{{ producto.precio }}</span>
+                </li>
+            {% endfor %}
+            <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
+                <span>Total</span>
+                <span>{{ total_carrito }}</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Formulario de selección de método de pago -->
+    <form method="post" action="{{ url_for('checkout') }}">
+        <div class="form-group">
+            <label for="payment_method">Selecciona tu método de pago</label>
+            <select id="payment_method" name="payment_method" class="form-control">
+                <option value="tarjeta">Tarjeta de crédito</option>
+                <option value="mercado_pago">Mercado Pago</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success btn-block">Confirmar y Pagar</button>
+    </form>
+</div>
+{% endblock %}
