@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 from email_validator import validate_email, EmailNotValidError
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import mercadopago
 
@@ -76,8 +77,8 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         contraseña = form.contraseña.data
-        user = Usuario.query.filter_by(email=email, contraseña_usuario=contraseña).first()
-        if user:
+        user = Usuario.query.filter_by(email=email).first()
+        if user and check_password_hash(user.contraseña_usuario, contraseña):
             session['user_id'] = user.id_usuario
             flash('Inicio de sesión exitoso', 'success')
             return redirect(url_for('index'))
@@ -104,10 +105,11 @@ def register():
         if Usuario.query.filter_by(email=email).first():
             flash('El email ya está registrado', 'danger')
             return redirect(url_for('register'))
+        hashed_password = generate_password_hash(contraseña, method='scrypt')
         new_user = Usuario(
             nombre_apellido=nombre_apellido,
             email=email,
-            contraseña_usuario=contraseña
+            contraseña_usuario=hashed_password
         )
         db.session.add(new_user)
         db.session.commit()
@@ -131,7 +133,6 @@ def checkout():
     form = CheckoutForm()
     if form.validate_on_submit():
         payment_method = form.payment_method.data
-        
         if payment_method == 'mercado_pago':
             return redirect(url_for('mercado_pago_payment'))
         elif payment_method == 'tarjeta':
@@ -140,14 +141,11 @@ def checkout():
         else:
             flash('Método de pago no válido', 'danger')
             return redirect(url_for('checkout'))
-    
     return render_template('checkout.html', form=form)
 
 @app.route('/mercado_pago_payment')
 def mercado_pago_payment():
     sdk = mercadopago.SDK("YOUR_ACCESS_TOKEN")
-
-    # Crear preferencia de pago
     preference_data = {
         "items": [
             {
@@ -163,10 +161,8 @@ def mercado_pago_payment():
         },
         "auto_return": "approved"
     }
-
     preference = sdk.preference().create(preference_data)
     preference_id = preference['response']['id']
-
     return redirect(preference['response']['init_point'])
 
 @app.route('/payment_success')
@@ -183,6 +179,42 @@ def payment_failure():
 def payment_pending():
     flash('Pago pendiente', 'warning')
     return redirect(url_for('index'))
+
+@app.route('/products')
+def products():
+    productos = Producto.query.all()
+    return render_template('products.html', productos=productos)
+
+@app.route('/add_to_cart/<int:producto_id>', methods=['POST'])
+def add_to_cart(producto_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('Debes iniciar sesión para agregar productos al carrito', 'warning')
+        return redirect(url_for('login'))
+
+    producto = Producto.query.get_or_404(producto_id)
+    carrito = Carrito.query.filter_by(id_usuario=user_id, status_carrito='activo').first()
+
+    if not carrito:
+        carrito = Carrito(id_usuario=user_id, status_carrito='activo')
+        db.session.add(carrito)
+        db.session.commit()
+
+    producto_en_carrito = Producto.query.filter_by(id_producto=producto_id, id_carrito=carrito.id_carrito).first()
+    if producto_en_carrito:
+        producto_en_carrito.cantidad_producto += 1
+    else:
+        nuevo_producto = Producto(
+            id_producto=producto_id,
+            precio=producto.precio,
+            cantidad_producto=1,
+            id_carrito=carrito.id_carrito
+        )
+        db.session.add(nuevo_producto)
+    
+    db.session.commit()
+    flash('Producto añadido al carrito', 'success')
+    return redirect(url_for('products'))
 
 # Inicialización de la base de datos
 def init_db():

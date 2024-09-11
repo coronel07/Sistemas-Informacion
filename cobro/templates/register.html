@@ -8,13 +8,6 @@
     <form method="post" action="{{ url_for('register') }}">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            {{ form.nombre_apellido.label(class="form-label") }}
-            {{ form.nombre_apellido(class="form-control") }}
-            {% for error in form.nombre_apellido.errors %}
-                <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-        </div>
-        <div class="form-group">
             {{ form.email.label(class="form-label") }}
             {{ form.email(class="form-control") }}
             {% for error in form.email.errors %}
@@ -25,13 +18,6 @@
             {{ form.contraseña.label(class="form-label") }}
             {{ form.contraseña(class="form-control") }}
             {% for error in form.contraseña.errors %}
-                <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-        </div>
-        <div class="form-group">
-            {{ form.confirm_contraseña.label(class="form-label") }}
-            {{ form.confirm_contraseña(class="form-control") }}
-            {% for error in form.confirm_contraseña.errors %}
                 <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>
