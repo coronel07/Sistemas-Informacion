@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Checkout con Mercado Pago</h2>
+<form method="post" action="{{ url_for('checkout_mercado_pago') }}">
+    <button type="submit" class="btn btn-primary">Pagar con Mercado Pago</button>
+</form>
+{% endblock %}
