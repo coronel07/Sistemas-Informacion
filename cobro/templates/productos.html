@@ -1,0 +1,30 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Nuestros Productos</h2>
+    <div class="row">
+        {% if productos %}
+            {% for producto in productos %}
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <img src="{{ producto.imagen_producto }}" class="card-img-top" alt="{{ producto.nombre_producto }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ producto.nombre_producto }}</h5>
+                        <p class="card-text">{{ producto.descripcion }}</p>
+                        <p class="card-text"><strong>Precio:</strong> ${{ producto.precio }}</p>
+                        <form action="{{ url_for('agregar_al_carrito', id_producto=producto.id_producto) }}" method="post">
+                            <button type="submit" class="btn btn-primary">Agregar al Carrito</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <p>No hay productos disponibles.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

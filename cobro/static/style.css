@@ -1,12 +1,24 @@
-/* Ajustes adicionales */
 body {
+    font-family: Arial, sans-serif;
     background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
 }
 
 header {
-    margin-bottom: 20px;
+    background-color: #343a40;
 }
 
-footer {
-    margin-top: 20px;
+h1 {
+    font-size: 2rem;
+}
+
+.navbar-brand, .nav-link {
+    color: white;
+}
+
+.footer {
+    background-color: #343a40;
+    color: white;
+    padding: 1rem 0;
 }

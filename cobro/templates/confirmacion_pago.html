@@ -1,0 +1,12 @@
+{% extends "index.html" %}
+
+{% block title %}Pago Confirmado{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+    <h2 class="mb-4">¡Pago Confirmado!</h2>
+    <p>Tu pago ha sido procesado exitosamente a través de Mercado Pago.</p>
+    <p>Gracias por tu compra.</p>
+    <a href="{{ url_for('productos') }}" class="btn btn-primary">Volver a la tienda</a>
+</div>
+{% endblock %}
